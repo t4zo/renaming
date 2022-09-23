@@ -1,13 +1,14 @@
 ﻿using System.Text.RegularExpressions;
 
-Console.WriteLine("Rename all PSA files of current directory? (y)");
+Console.Write("Rename ALL PSA files of current directory? (y): ");
 var input = Console.ReadKey();
+
 Console.WriteLine();
-if(input.Key == ConsoleKey.Y)
+if (input.Key == ConsoleKey.Y)
 {
     var directory = Directory.GetCurrentDirectory();
-    var fileames = Directory.GetFiles(directory);
-    foreach(var filename in fileames)
+    var filenames = Directory.GetFiles(directory);
+    foreach (var filename in filenames)
     {
         var PSA = "PSA";
         var resolution1080p = "1080p";
@@ -19,33 +20,29 @@ if(input.Key == ConsoleKey.Y)
         {
             if (filename.Contains(resolution1080p, StringComparison.OrdinalIgnoreCase))
             {
-                var SXXEXX = regex.Match(filename);
-
-                var firstFilename = filename.Split(resolution1080p)[0];
-                var newFilename = firstFilename.Replace(".", " ").Trim();
-                var indexOfSXEXX = newFilename.IndexOf(SXXEXX.Value, StringComparison.OrdinalIgnoreCase);
-                var finalFilename = newFilename.Insert(indexOfSXEXX+6, " -");
-
-                Console.WriteLine("======================================================================");
-                Console.WriteLine(file);
-                file.MoveTo($"{finalFilename}{file.Extension}");
-                Console.WriteLine(finalFilename);
-                Console.WriteLine("======================================================================");
+                Rename(resolution1080p, filename, file, regex);
             }
 
             if (filename.Contains(resolution720p, StringComparison.OrdinalIgnoreCase))
             {
-                var SXXEXX = regex.Match(filename);
-
-                var firstFilename = filename.Split(resolution720p)[0];
-                var newFilename = firstFilename.Replace(".", " ").Trim();
-                var indexOfSXEXX = newFilename.IndexOf(SXXEXX.Value, StringComparison.OrdinalIgnoreCase);
-                var finalFilename = newFilename.Insert(indexOfSXEXX+6, "- ");
-
-                Console.WriteLine(file);
-                file.MoveTo($"{finalFilename}{file.Extension}");
-                Console.WriteLine(newFilename);
+                Rename(resolution720p, filename, file, regex);
             }
         }
     }
+}
+
+void Rename(string resolution, string filename, FileInfo file, Regex regex)
+{
+    var SXXEXX = regex.Match(filename);
+
+    var firstFilename = filename.Split(resolution)[0];
+    var newFilename = firstFilename.Replace(".", " ").Trim();
+    var indexOfSXEXX = newFilename.IndexOf(SXXEXX.Value, StringComparison.OrdinalIgnoreCase);
+    var finalFilename = newFilename.Insert(indexOfSXEXX + 6, " -");
+
+    Console.WriteLine("======================================================================");
+    Console.WriteLine(file);
+    file.MoveTo($"{finalFilename}{file.Extension}");
+    Console.WriteLine(finalFilename);
+    Console.WriteLine("======================================================================");
 }
