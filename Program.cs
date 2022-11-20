@@ -35,10 +35,22 @@ void Rename(string resolution, string filename, FileInfo file, Regex regex)
 {
     var SXXEXX = regex.Match(filename);
 
-    var firstFilename = filename.Split(resolution)[0];
+    var filenameSplit = filename.Split(resolution);
+    var firstFilename = filenameSplit[0];
     var newFilename = firstFilename.Replace(".", " ").Trim();
-    var indexOfSXEXX = newFilename.IndexOf(SXXEXX.Value, StringComparison.OrdinalIgnoreCase);
-    var finalFilename = newFilename.Insert(indexOfSXEXX + 6, " -");
+    var indexOfSXXEXX = newFilename.LastIndexOf(SXXEXX.Value, StringComparison.OrdinalIgnoreCase);
+    var finalFilename = string.Empty;
+
+    var indexOfSXXEXXLast = indexOfSXXEXX + 6;
+    try
+    {
+        var hasTitle = newFilename[indexOfSXXEXXLast + 1];
+        finalFilename = newFilename.Insert(indexOfSXXEXXLast, " -");
+    }
+    catch
+    {
+        finalFilename = newFilename;
+    }
 
     Console.WriteLine("======================================================================");
     Console.WriteLine(file);
