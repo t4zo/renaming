@@ -16,8 +16,8 @@ if (input.Key == ConsoleKey.Y)
         var file = new FileInfo(filename);
         var regex = new Regex(@"[Ss]\d{2}[Ee]\d{2}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        if (filename.Contains(PSA, StringComparison.OrdinalIgnoreCase))
-        {
+        // if (filename.Contains(PSA, StringComparison.OrdinalIgnoreCase))
+        // {
             if (filename.Contains(resolution1080p, StringComparison.OrdinalIgnoreCase))
             {
                 Rename(resolution1080p, filename, file, regex);
@@ -27,7 +27,7 @@ if (input.Key == ConsoleKey.Y)
             {
                 Rename(resolution720p, filename, file, regex);
             }
-        }
+        // }
     }
 }
 
