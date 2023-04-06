@@ -2,59 +2,56 @@
 
 Console.Write("Rename ALL PSA files of current directory? (y): ");
 var input = Console.ReadKey();
-
 Console.WriteLine();
+
+// const string PSA = "PSA";
+const string resolution1080p = "1080p";
+const string resolution720p = "720p";
+var regex = new Regex(@"[Ss]\d{2}[Ee]\d{2}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
 if (input.Key == ConsoleKey.Y)
 {
     var directory = Directory.GetCurrentDirectory();
-    var filenames = Directory.GetFiles(directory);
+    var filenames = Directory.GetFiles(directory)
+        .Where(filename => filename.Contains(resolution720p, StringComparison.OrdinalIgnoreCase)
+                           || filename.Contains(resolution1080p, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
     foreach (var filename in filenames)
     {
-        var PSA = "PSA";
-        var resolution1080p = "1080p";
-        var resolution720p = "720p";
         var file = new FileInfo(filename);
-        var regex = new Regex(@"[Ss]\d{2}[Ee]\d{2}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        // if (filename.Contains(PSA, StringComparison.OrdinalIgnoreCase))
-        // {
-            if (filename.Contains(resolution1080p, StringComparison.OrdinalIgnoreCase))
-            {
-                Rename(resolution1080p, filename, file, regex);
-            }
-
-            if (filename.Contains(resolution720p, StringComparison.OrdinalIgnoreCase))
-            {
-                Rename(resolution720p, filename, file, regex);
-            }
-        // }
+        _ = filename switch
+        {
+            not null when filename.Contains(resolution720p, StringComparison.OrdinalIgnoreCase) =>
+                Rename(resolution720p, file),
+            not null when filename.Contains(resolution1080p, StringComparison.OrdinalIgnoreCase) =>
+                Rename(resolution1080p, file),
+            _ => true,
+        };
     }
 }
 
-void Rename(string resolution, string filename, FileInfo file, Regex regex)
+bool Rename(string resolution, FileInfo file)
 {
-    var SXXEXX = regex.Match(filename);
+    var SXXEXX = regex.Match(file.FullName) ?? throw new ArgumentNullException($"File not found: {file.FullName}");
 
-    var filenameSplit = filename.Split(resolution);
-    var firstFilename = filenameSplit[0];
-    var newFilename = firstFilename.Replace(".", " ").Trim();
+    var filename = file.Name.Split(resolution, StringSplitOptions.TrimEntries).First();
+    var newFilename = filename.Replace(".", " ").Trim();
+
     var indexOfSXXEXX = newFilename.LastIndexOf(SXXEXX.Value, StringComparison.OrdinalIgnoreCase);
-    var finalFilename = string.Empty;
+    var lastIndexOfSXXEXX = indexOfSXXEXX + 6;
 
-    var indexOfSXXEXXLast = indexOfSXXEXX + 6;
-    try
+    if (newFilename.Length > lastIndexOfSXXEXX)
     {
-        var hasTitle = newFilename[indexOfSXXEXXLast + 1];
-        finalFilename = newFilename.Insert(indexOfSXXEXXLast, " -");
-    }
-    catch
-    {
-        finalFilename = newFilename;
+        newFilename = newFilename.Insert(lastIndexOfSXXEXX, " -");
     }
 
     Console.WriteLine("======================================================================");
-    Console.WriteLine(file);
-    file.MoveTo($"{finalFilename}{file.Extension}");
-    Console.WriteLine(finalFilename);
+    Console.WriteLine(file.Name);
+    file.MoveTo($"{file.DirectoryName}{Path.DirectorySeparatorChar}{newFilename}{file.Extension}");
+    Console.WriteLine(newFilename);
     Console.WriteLine("======================================================================");
+
+    return false;
 }
